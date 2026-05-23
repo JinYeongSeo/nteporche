@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>이환 918 스파이더 블라인드 박스 시뮬레이터 v3</title>
+    <title>이환 918 스파이더 블라인드 박스 시뮬레이터 v5</title>
     <style>
         /* 기본 스타일 정립 */
         :root {
@@ -16,7 +16,11 @@
             --color-spider: #ff4081; /* 핑크 */
             --color-costume: #ffeb3b; /* 노랑 */
             --color-item: #00e5ff;   /* 하늘색 */
+            --color-prob: #00ffcc;   /* 확률 강조용 형광 민트 */
             
+            --color-paid: #ff4081; /* 유료 환석 강조색 */
+            --color-free: #00e5ff; /* 무료 환석 강조색 */
+
             --btn-color: #e91e63;
             --btn-hover: #c2185b;
         }
@@ -34,7 +38,9 @@
         .status-item { text-align: center; }
         .status-label { font-size: 12px; color: var(--text-muted); display: block; margin-bottom: 5px; }
         .status-value { font-size: 20px; font-weight: bold; }
-        #costDisplay { color: var(--color-costume); }
+        
+        .currency-paid { color: var(--color-paid); }
+        .currency-free { color: var(--color-free); }
 
         /* 뽑기 버튼 */
         .btn { display: block; width: 100%; max-width: 300px; margin: 0 auto 30px auto; padding: 18px; font-size: 18px; font-weight: bold; background-color: var(--btn-color); color: white; border: none; border-radius: 50px; cursor: pointer; transition: 0.2s; box-shadow: 0 4px 15px rgba(233, 30, 99, 0.3); text-transform: uppercase; }
@@ -46,7 +52,7 @@
         .gacha-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 15px; margin-bottom: 30px; }
 
         /* 아이템 카드 기본 스타일 */
-        .item-card { background-color: var(--card-bg); border: 2px solid var(--border-color); border-radius: 12px; padding: 15px; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: space-between; position: relative; transition: all 0.3s ease; box-shadow: 0 4px 6px rgba(0,0,0,0.3); overflow: hidden; height: 220px; }
+        .item-card { background-color: var(--card-bg); border: 2px solid var(--border-color); border-radius: 12px; padding: 15px; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: space-between; position: relative; transition: all 0.3s ease; box-shadow: 0 4px 6px rgba(0,0,0,0.3); overflow: hidden; height: 230px; }
 
         .item-card:not(.faded):hover { transform: translateY(-5px); box-shadow: 0 8px 20px rgba(255,255,255,0.1); }
 
@@ -68,13 +74,16 @@
         .spider .item-name { color: var(--color-spider); }
         .costume .item-name { color: var(--color-costume); }
         
-        .item-meta { display: flex; justify-content: space-between; font-size: 11px; color: var(--text-muted); margin-top: 5px; }
+        /* 확률 텍스트 강조 CSS */
+        .item-prob { font-size: 16px; font-weight: bold; color: var(--color-prob); margin: 5px 0; text-shadow: 0 0 5px rgba(0, 255, 204, 0.3); }
+        
+        .item-meta { display: flex; justify-content: center; font-size: 11px; color: var(--text-muted); margin-top: 2px; }
 
         /* 하단 로그창 */
         .log-container { background: #080808; padding: 15px; border-radius: 10px; border: 1px solid var(--border-color); }
         .log-header { font-size: 14px; color: var(--text-muted); margin-bottom: 10px; padding-bottom: 5px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; }
-        .log-box { height: 150px; overflow-y: auto; font-size: 13px; color: #ccc; display: flex; flex-direction: column-reverse; }
-        .log-entry { margin: 4px 0; padding: 2px 0; border-bottom: 1px solid #1a1a1a; }
+        .log-box { height: 180px; overflow-y: auto; font-size: 13px; color: #ccc; display: flex; flex-direction: column-reverse; }
+        .log-entry { margin: 4px 0; padding: 4px 0; border-bottom: 1px solid #1a1a1a; line-height: 1.4; }
         .log-time { color: var(--text-muted); margin-right: 8px; }
         .get-spider { color: var(--color-spider); font-weight: bold; }
         .get-costume { color: var(--color-costume); font-weight: bold; }
@@ -84,33 +93,29 @@
         ::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
         ::-webkit-scrollbar-thumb:hover { background: #444; }
 
-        /* ★★★ 모바일 최적화 (Media Query) ★★★ */
+        /* 모바일 최적화 */
         @media (max-width: 600px) {
             body { padding: 10px; }
             h1 { font-size: 22px; }
             .sub-title { font-size: 12px; margin-bottom: 20px; }
             
-            /* 상태창을 세로로 정렬하고 가독성 높임 */
             .status-bar { flex-direction: column; gap: 12px; padding: 15px; }
             .status-item { width: 100%; display: flex; justify-content: space-between; align-items: center; }
             .status-label { margin-bottom: 0; font-size: 13px; }
-            .status-value { font-size: 18px; }
+            .status-value { font-size: 16px; }
 
-            /* 가챠 박스를 모바일에서 무조건 2열 고정 */
             .gacha-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 20px; }
             
-            /* 박스 크기 및 폰트 축소 */
-            .item-card { height: 180px; padding: 10px; }
+            /* 박스 크기 조절 */
+            .item-card { height: 195px; padding: 10px; }
             .item-visual { font-size: 40px; }
             .item-name { font-size: 12px; height: 36px; line-height: 1.2; }
             
-            /* 확률 텍스트가 겹치지 않게 세로 배열 */
-            .item-meta { flex-direction: column; gap: 4px; align-items: center; font-size: 10px; }
+            /* 확률 폰트 크기 모바일에 맞게 조절 */
+            .item-prob { font-size: 15px; }
+            .item-meta { font-size: 10px; }
             
-            /* 스탬프 크기 조절 */
             .item-card.faded::after { font-size: 16px; border-width: 2px; padding: 3px 6px; }
-
-            /* 버튼 크기 및 여백 조절 */
             .btn { max-width: 100%; font-size: 16px; padding: 15px; margin-bottom: 20px; }
         }
     </style>
@@ -126,8 +131,9 @@
                 <span class="status-value"><strong id="pullCount">0</strong> / 15</span>
             </div>
             <div class="status-item">
-                <span class="status-label">다음 소모 재화 (이클/폰스)</span>
-                <span class="status-value" id="costDisplay">100</span>
+                <span class="status-label">다음 소모 재화 선택</span>
+                <span class="status-value" id="costDisplay">
+                    </span>
             </div>
         </div>
 
@@ -157,8 +163,27 @@
             { id: 6, name: '갑형 코인 * 100,000', type: 'item', initQty: 5, weight: 100, icon: '💰' }
         ];
 
+        // 이미지(시트) 기반 회차별 소모 재화 데이터 파싱 완료
+        // paid: 유료 환석(흑돌), free: 무료 환석(백돌)
+        const pullCosts = [
+            { paid: 120, free: 40 },
+            { paid: 190, free: 70 },
+            { paid: 280, free: 110 },
+            { paid: 380, free: 150 },
+            { paid: 490, free: 200 },
+            { paid: 650, free: 330 },
+            { paid: 780, free: 390 },
+            { paid: 950, free: 480 },
+            { paid: 1120, free: 560 },
+            { paid: 1290, free: 650 },
+            { paid: 1630, free: 980 },
+            { paid: 1970, free: 1180 },
+            { paid: 2310, free: 1390 },
+            { paid: 2650, free: 1590 },
+            { paid: 2990, free: 1790 }
+        ];
+
         let pool = JSON.parse(JSON.stringify(initialPoolData));
-        const costs = [100, 200, 300, 500, 800, 1200, 1700, 2300, 3000, 3800, 4700, 5700, 6800, 8000, 9500];
         let pullCount = 0;
         let isDrawing = false; 
 
@@ -172,11 +197,12 @@
             countEl.innerText = pullCount;
             
             if (pullCount < 15) {
-                costEl.innerText = costs[pullCount].toLocaleString();
+                const currentCost = pullCosts[pullCount];
+                costEl.innerHTML = `<span class="currency-paid">유료 환석 ${currentCost.paid.toLocaleString()}</span> / <span class="currency-free">무료 환석 ${currentCost.free.toLocaleString()}</span>`;
                 btnEl.disabled = false;
                 btnEl.innerText = `블라인드 박스 개봉`;
             } else {
-                costEl.innerText = '0';
+                costEl.innerText = '-';
                 btnEl.disabled = true;
                 btnEl.innerText = '완료 (모든 보상 획득)';
             }
@@ -197,9 +223,9 @@
                     <div class="item-visual">${item.icon}</div>
                     <div class="item-info">
                         <div class="item-name">${item.name}</div>
+                        <div class="item-prob">${prob.toFixed(2)}%</div>
                         <div class="item-meta">
-                            <span>수량: <strong>${item.qty}</strong>/${item.initQty}</span>
-                            <span>${prob.toFixed(2)}%</span>
+                            <span>남은 수량: <strong>${item.qty}</strong> / ${item.initQty}</span>
                         </div>
                     </div>
                 `;
@@ -251,9 +277,12 @@
             if(item.type === 'spider') nameClass = 'get-spider';
             if(item.type === 'costume') nameClass = 'get-costume';
 
+            const costUsed = pullCosts[pullCount-1];
+
             entry.innerHTML = `
                 <span class="log-time">[${timeStr}]</span>
-                ${pullCount}회차: <span class="${nameClass}">${item.name}</span> 획득 (소모:${costs[pullCount-1].toLocaleString()})
+                ${pullCount}회차: <span class="${nameClass}">${item.name}</span> 획득 <br>
+                <span style="font-size: 11px; color: var(--text-muted); margin-left: 55px;">(소모 비용 - <span class="currency-paid">유료 환석 ${costUsed.paid.toLocaleString()}</span> or <span class="currency-free">무료 환석 ${costUsed.free.toLocaleString()}</span>)</span>
             `;
             
             logBoxEl.appendChild(entry);
