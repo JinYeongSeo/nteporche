@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>이환 918 스파이더 블라인드 박스 시뮬레이터 v7</title>
+    <title>이환 918 스파이더 블라인드 박스 시뮬레이터 v8</title>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
-        /* 어반/사이버펑크 스타일 CSS 최적화 */
+        /* 네온 어반 스타일 테마 */
         :root {
             --bg-base: #0b0b10;
             --bg-gradient: radial-gradient(circle at 50% 0%, #1a1a2e 0%, #0b0b10 80%);
@@ -22,8 +22,11 @@
             --color-item: #05d9e8; /* 네온 시안 */
             --color-prob: #00ffcc; /* 확률 민트 */
             
-            --color-paid: #f9d423; /* 이상 수정 */
-            --color-free: #05d9e8; /* 무료 환석 */
+            --color-hwanseok: #ff9100; /* 환석 오렌지 */
+            --color-ponds: #00e5ff; /* 폰즈 시안 */
+            
+            --btn-hwanseok-bg: #ff9100;
+            --btn-ponds-bg: #00acc1;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -39,13 +42,12 @@
 
         .container { max-width: 1000px; margin: 0 auto; }
         
-        /* 헤더 디자인 */
         .header { text-align: center; margin-bottom: 30px; margin-top: 10px; }
         .header h1 { color: #fff; font-weight: 900; letter-spacing: 2px; font-size: 32px; text-shadow: 0 0 15px rgba(255, 255, 255, 0.3); margin-bottom: 5px; }
         .header .highlight { color: var(--color-spider); }
         .header p { color: var(--text-muted); font-size: 14px; letter-spacing: 1px; }
 
-        /* 글래스모피즘 상태창 */
+        /* 글래스모피즘 상태 대시보드 */
         .status-dashboard {
             display: grid;
             grid-template-columns: 1fr 2fr 1fr;
@@ -59,20 +61,19 @@
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
         }
 
-        .status-box { text-align: center; padding: 10px; background: rgba(0, 0, 0, 0.2); border-radius: 10px; border: 1px solid rgba(255,255,255,0.05); }
-        .status-box.main-total { background: rgba(255, 42, 109, 0.05); border-color: rgba(255, 42, 109, 0.2); }
+        .status-box { text-align: center; padding: 10px; background: rgba(0, 0, 0, 0.2); border-radius: 10px; border: 1px solid rgba(255,255,255,0.05); display: flex; flex-direction: column; justify-content: center; }
+        .status-box.main-total { background: rgba(5, 217, 232, 0.02); border-color: rgba(5, 217, 232, 0.15); }
         
         .status-label { font-size: 12px; color: var(--text-muted); display: block; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px; }
         .status-value { font-size: 24px; font-weight: 900; }
         
         .val-spider { color: var(--color-spider); }
-        .val-total { font-size: 28px; color: #fff; text-shadow: 0 0 10px rgba(255,255,255,0.5); }
-        .val-sub { font-size: 13px; color: var(--text-muted); margin-top: 5px; display: flex; justify-content: center; gap: 10px; }
+        .val-total-split { font-size: 20px; color: #fff; display: flex; justify-content: center; gap: 20px; font-weight: 900; }
         
-        .currency-paid { color: var(--color-paid); font-weight: 700; }
-        .currency-free { color: var(--color-free); font-weight: 700; }
+        .currency-hwanseok { color: var(--color-hwanseok); }
+        .currency-ponds { color: var(--color-ponds); }
 
-        /* 뽑기 액션 영역 */
+        /* 가챠 버튼 그룹 */
         .action-area { display: flex; gap: 15px; justify-content: center; margin-bottom: 35px; }
         .btn { 
             flex: 1; max-width: 350px; padding: 18px 20px; font-size: 18px; font-weight: 900; 
@@ -80,14 +81,14 @@
             position: relative; overflow: hidden; color: #000;
         }
         
-        .btn-paid { background: linear-gradient(135deg, #f9d423 0%, #ff4e50 100%); box-shadow: 0 4px 15px rgba(249, 212, 35, 0.3); }
-        .btn-free { background: linear-gradient(135deg, #05d9e8 0%, #0182b5 100%); box-shadow: 0 4px 15px rgba(5, 217, 232, 0.3); color: #fff; }
+        .btn-hwanseok { background: linear-gradient(135deg, #ffb300 0%, #ff6f00 100%); box-shadow: 0 4px 15px rgba(255, 145, 0, 0.3); color: #fff; }
+        .btn-ponds { background: linear-gradient(135deg, #00e5ff 0%, #00838f 100%); box-shadow: 0 4px 15px rgba(0, 229, 255, 0.3); color: #fff; }
         
         .btn:hover:not(:disabled) { transform: translateY(-3px); filter: brightness(1.1); box-shadow: 0 8px 25px rgba(255,255,255,0.2); }
         .btn:active:not(:disabled) { transform: translateY(1px); }
-        .btn:disabled { background: #2a2a35; color: #555; cursor: not-allowed; box-shadow: none; }
+        .btn:disabled { background: #2a2a35; color: #555; cursor: not-allowed; box-shadow: none; transform: none; filter: none; }
 
-        .btn-subtext { font-size: 13px; font-weight: 700; margin-top: 5px; display: block; opacity: 0.85; }
+        .btn-subtext { font-size: 13px; font-weight: 700; margin-top: 5px; display: block; opacity: 0.9; }
 
         /* 가챠 박스 그리드 */
         .gacha-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px; margin-bottom: 35px; }
@@ -102,7 +103,6 @@
         
         .item-card:not(.faded):hover { transform: translateY(-5px); background: rgba(30, 30, 45, 0.9); border-color: rgba(255,255,255,0.3); }
         
-        /* 등급별 네온 글로우 */
         .item-card.spider { border: 1px solid var(--color-spider); box-shadow: inset 0 0 20px rgba(255, 42, 109, 0.1), 0 0 10px rgba(255, 42, 109, 0.2); }
         .item-card.costume { border: 1px solid var(--color-costume); box-shadow: inset 0 0 20px rgba(249, 212, 35, 0.1), 0 0 10px rgba(249, 212, 35, 0.2); }
 
@@ -125,7 +125,7 @@
         .item-prob { font-size: 18px; font-weight: 900; color: var(--color-prob); margin: 5px 0; text-shadow: 0 0 8px rgba(0, 255, 204, 0.4); }
         .item-meta { font-size: 11px; color: var(--text-muted); background: rgba(0,0,0,0.3); padding: 3px 8px; border-radius: 20px; display: inline-block; }
 
-        /* 터미널 스타일 로그창 */
+        /* 로그 세팅 */
         .log-container { background: #050508; padding: 20px; border-radius: 14px; border: 1px solid #1f1f2e; box-shadow: inset 0 0 20px rgba(0,0,0,0.5); }
         .log-header { font-size: 13px; color: var(--color-item); margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px dashed #1f1f2e; display: flex; justify-content: space-between; font-weight: 700; letter-spacing: 1px; }
         .btn-reset { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: var(--text-muted); cursor: pointer; font-size: 11px; padding: 4px 10px; border-radius: 4px; transition: 0.2s; }
@@ -141,7 +141,7 @@
         ::-webkit-scrollbar-thumb { background: #2a2a35; border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: var(--color-item); }
 
-        /* 모바일 최적화 반응형 */
+        /* 모바일 반응형 쿼리 */
         @media (max-width: 768px) {
             .status-dashboard { grid-template-columns: 1fr; gap: 10px; padding: 15px; }
             .action-area { flex-direction: column; gap: 12px; }
@@ -152,6 +152,7 @@
             .item-name { font-size: 11px; height: 32px; }
             .item-prob { font-size: 16px; }
             .header h1 { font-size: 24px; }
+            .val-total-split { font-size: 16px; flex-direction: column; gap: 5px; }
         }
     </style>
 </head>
@@ -169,32 +170,30 @@
             </div>
             
             <div class="status-box main-total">
-                <span class="status-label" style="color: #fff;">전체 소모 환석 (Total)</span>
-                <span class="status-value val-total" id="totalCombined">0</span>
-                <div class="val-sub">
-                    <span><span class="currency-paid">수정</span> <span id="totalPaid">0</span></span>
-                    <span>|</span>
-                    <span><span class="currency-free">무료</span> <span id="totalFree">0</span></span>
+                <span class="status-label">누적 소모량 (Total Spent)</span>
+                <div class="val-total-split">
+                    <div><span class="currency-hwanseok">환석:</span> <span id="totalHwanseok">0</span>개</div>
+                    <div><span class="currency-ponds">폰즈:</span> <span id="totalPonds">0</span>만</div>
                 </div>
             </div>
 
             <div class="status-box">
                 <span class="status-label">다음 필요 재화</span>
-                <span class="status-value" style="font-size: 16px; display: flex; flex-direction: column; gap: 4px; margin-top: 5px;">
-                    <span id="nextPaid" class="currency-paid">-</span>
-                    <span id="nextFree" class="currency-free">-</span>
+                <span class="status-value" style="font-size: 15px; display: flex; flex-direction: column; gap: 4px;">
+                    <span id="nextHwanseok" class="currency-hwanseok">-</span>
+                    <span id="nextPonds" class="currency-ponds">-</span>
                 </span>
             </div>
         </div>
 
         <div class="action-area">
-            <button id="btnPaid" class="btn btn-paid" onclick="draw('paid')">
-                이상 수정으로 개봉
-                <span class="btn-subtext" id="costPaidText">대기 중</span>
+            <button id="btnHwanseok" class="btn btn-hwanseok" onclick="draw('hwanseok')">
+                환석으로 개봉
+                <span class="btn-subtext" id="costHwanseokText">대기 중</span>
             </button>
-            <button id="btnFree" class="btn btn-free" onclick="draw('free')">
-                무료 환석으로 개봉
-                <span class="btn-subtext" id="costFreeText">대기 중</span>
+            <button id="btnPonds" class="btn btn-ponds" onclick="draw('ponds')">
+                폰즈로 개봉
+                <span class="btn-subtext" id="costPondsText">대기 중</span>
             </button>
         </div>
 
@@ -207,7 +206,7 @@
                 <button class="btn-reset" onclick="resetSim()">[ 시스템 초기화 ]</button>
             </div>
             <div class="log-box" id="logBox">
-                <div class="log-entry"><span class="log-time">[00:00:00]</span> SYSTEM: 시뮬레이터 구동 완료. 개봉을 시작하십시오.</div>
+                <div class="log-entry"><span class="log-time">[00:00:00]</span> SYSTEM: 시뮬레이터 구동 완료. 개봉 재화를 선택하십시오.</div>
             </div>
         </div>
     </div>
@@ -219,77 +218,75 @@
             { id: 3, name: '날조의 주사위 * 10', type: 'item', initQty: 1, weight: 5, icon: '🎲' },
             { id: 4, name: '무몽의 과핵 * 10', type: 'item', initQty: 3, weight: 10, icon: '🔮' },
             { id: 5, name: '특급 헌터 공략 * 10', type: 'item', initQty: 4, weight: 50, icon: '📕' },
-            { id: 6, name: '갑형 코인 * 100,000', type: 'item', initQty: 5, weight: 100, icon: '💰' }
+            { id: 6, name: '비틀 코인 * 100,000', type: 'item', initQty: 5, weight: 100, icon: '💰' }
         ];
 
+        // 업데이트된 재화 테이블 반영 (폰즈는 숫자 그대로 쓰고 뒤에 '만'만 붙임)
         const pullCosts = [
-            { free: 120, paid: 40 },
-            { free: 190, paid: 70 },
-            { free: 280, paid: 110 },
-            { free: 380, paid: 150 },
-            { free: 490, paid: 200 },
-            { free: 650, paid: 330 },
-            { free: 780, paid: 390 },
-            { free: 950, paid: 480 },
-            { free: 1120, paid: 560 },
-            { free: 1290, paid: 650 },
-            { free: 1630, paid: 980 },
-            { free: 1970, paid: 1180 },
-            { free: 2310, paid: 1390 },
-            { free: 2650, paid: 1590 },
-            { free: 2990, paid: 1790 }
+            { hwanseok: 50, ponds: 5 },
+            { hwanseok: 80, ponds: 8 },
+            { hwanseok: 100, ponds: 10 },
+            { hwanseok: 150, ponds: 20 },
+            { hwanseok: 200, ponds: 30 },
+            { hwanseok: 300, ponds: 50 },
+            { hwanseok: 500, ponds: 80 },
+            { hwanseok: 800, ponds: 100 },
+            { hwanseok: 1000, ponds: 150 },
+            { hwanseok: 1200, ponds: 200 },
+            { hwanseok: 1600, ponds: 300 },
+            { hwanseok: 1800, ponds: 350 },
+            { hwanseok: 2000, ponds: 400 },
+            { hwanseok: 2200, ponds: 450 },
+            { hwanseok: 2400, ponds: 500 }
         ];
 
         let pool = JSON.parse(JSON.stringify(initialPoolData));
         let pullCount = 0;
         let isDrawing = false; 
         
-        let totalPaidSpent = 0;
-        let totalFreeSpent = 0;
+        let totalHwanseokSpent = 0;
+        let totalPondsSpent = 0;
 
         const gridEl = document.getElementById('gachaGrid');
         const countEl = document.getElementById('pullCount');
         
-        const totalCombinedEl = document.getElementById('totalCombined');
-        const totalPaidEl = document.getElementById('totalPaid');
-        const totalFreeEl = document.getElementById('totalFree');
+        const totalHwanseokEl = document.getElementById('totalHwanseok');
+        const totalPondsEl = document.getElementById('totalPonds');
         
-        const nextPaidEl = document.getElementById('nextPaid');
-        const nextFreeEl = document.getElementById('nextFree');
+        const nextHwanseokEl = document.getElementById('nextHwanseok');
+        const nextPondsEl = document.getElementById('nextPonds');
 
-        const btnPaidEl = document.getElementById('btnPaid');
-        const btnFreeEl = document.getElementById('btnFree');
-        const costPaidText = document.getElementById('costPaidText');
-        const costFreeText = document.getElementById('costFreeText');
+        const btnHwanseokEl = document.getElementById('btnHwanseok');
+        const btnPondsEl = document.getElementById('btnPonds');
+        const costHwanseokText = document.getElementById('costHwanseokText');
+        const costPondsText = document.getElementById('costPondsText');
 
         const logBoxEl = document.getElementById('logBox');
 
         function updateUI() {
             countEl.innerText = pullCount;
             
-            // 누적 렌더링
-            totalPaidEl.innerText = totalPaidSpent.toLocaleString();
-            totalFreeEl.innerText = totalFreeSpent.toLocaleString();
-            totalCombinedEl.innerText = (totalPaidSpent + totalFreeSpent).toLocaleString();
+            totalHwanseokEl.innerText = totalHwanseokSpent.toLocaleString();
+            totalPondsEl.innerText = totalPondsSpent.toLocaleString();
             
             if (pullCount < 15) {
                 const currentCost = pullCosts[pullCount];
                 
-                nextPaidEl.innerText = `수정 ${currentCost.paid.toLocaleString()}개`;
-                nextFreeEl.innerText = `무료 ${currentCost.free.toLocaleString()}개`;
+                nextHwanseokEl.innerText = `환석 ${currentCost.hwanseok.toLocaleString()}개`;
+                nextPondsEl.innerText = `폰즈 ${currentCost.ponds.toLocaleString()}만`;
 
-                btnPaidEl.disabled = false;
-                btnFreeEl.disabled = false;
-                costPaidText.innerText = `(- ${currentCost.paid.toLocaleString()} 소모)`;
-                costFreeText.innerText = `(- ${currentCost.free.toLocaleString()} 소모)`;
+                btnHwanseokEl.disabled = false;
+                btnPondsEl.disabled = false;
+                costHwanseokText.innerText = `(- ${currentCost.hwanseok.toLocaleString()}개)`;
+                costPondsText.innerText = `(- ${currentCost.ponds.toLocaleString()}만)`;
             } else {
-                nextPaidEl.innerText = `-`;
-                nextFreeEl.innerText = `-`;
+                nextHwanseokEl.innerText = `-`;
+                nextPondsEl.innerText = `-`;
 
-                btnPaidEl.disabled = true;
-                btnFreeEl.disabled = true;
-                costPaidText.innerText = `(모든 보상 획득)`;
-                costFreeText.innerText = `(모든 보상 획득)`;
+                btnHwanseokEl.disabled = true;
+                btnPondsEl.disabled = true;
+                costHwanseokText.innerText = `(모든 보상 획득)`;
+                costPondsText.innerText = `(모든 보상 획득)`;
             }
 
             const totalWeight = pool.reduce((sum, item) => sum + (item.qty * item.weight), 0);
@@ -320,10 +317,10 @@
             if (pullCount >= 15 || isDrawing) return;
             
             isDrawing = true;
-            btnPaidEl.disabled = true;
-            btnFreeEl.disabled = true;
+            btnHwanseokEl.disabled = true;
+            btnPondsEl.disabled = true;
 
-            const costUsed = type === 'paid' ? pullCosts[pullCount].paid : pullCosts[pullCount].free;
+            const costUsed = type === 'hwanseok' ? pullCosts[pullCount].hwanseok : pullCosts[pullCount].ponds;
 
             let totalWeight = pool.reduce((sum, item) => sum + (item.qty * item.weight), 0);
             let rand = Math.random() * totalWeight;
@@ -342,15 +339,15 @@
             }
 
             if (wonItem) {
-                if (type === 'paid') totalPaidSpent += costUsed;
-                else totalFreeSpent += costUsed;
+                if (type === 'hwanseok') totalHwanseokSpent += costUsed;
+                else totalPondsSpent += costUsed;
                 
                 setTimeout(() => {
                     pullCount++;
                     addLog(wonItem, type, costUsed);
                     updateUI();
                     isDrawing = false;
-                }, 300); // 딜레이 약간 줄임
+                }, 300);
             }
         }
 
@@ -364,11 +361,11 @@
             let nameClass = '';
             let itemNameStr = item.name;
             if(item.type === 'spider') { nameClass = 'val-spider'; itemNameStr = `[★★★★★] ${item.name}`; }
-            else if(item.type === 'costume') { nameClass = 'currency-paid'; itemNameStr = `[★★★★] ${item.name}`; }
+            else if(item.type === 'costume') { nameClass = 'currency-hwanseok'; itemNameStr = `[★★★★] ${item.name}`; }
 
-            const costText = type === 'paid' 
-                ? `<span class="currency-paid">이상 수정 -${cost.toLocaleString()}</span>` 
-                : `<span class="currency-free">무료 환석 -${cost.toLocaleString()}</span>`;
+            const costText = type === 'hwanseok' 
+                ? `<span class="currency-hwanseok">환석 -${cost.toLocaleString()}개</span>` 
+                : `<span class="currency-ponds">폰즈 -${cost.toLocaleString()}만</span>`;
 
             entry.innerHTML = `
                 <span class="log-time">[${timeStr}]</span>
@@ -386,16 +383,14 @@
             pool = JSON.parse(JSON.stringify(initialPoolData));
             pool.forEach(item => item.qty = item.initQty);
             pullCount = 0;
-            totalPaidSpent = 0;
-            totalFreeSpent = 0;
+            totalHwanseokSpent = 0;
+            totalPondsSpent = 0;
             logBoxEl.innerHTML = '<div class="log-entry"><span class="log-time">[00:00:00]</span> SYSTEM: 데이터가 초기화되었습니다.</div>';
             updateUI();
         }
 
-        // 초기화 실행
         pool.forEach(item => item.qty = item.initQty);
         updateUI();
-
     </script>
 </body>
 </html>
