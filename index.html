@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>이환 918 스파이더 블라인드 박스 시뮬레이터 v10 (오리지널 확률 롤백)</title>
+    <title>이환 918 스파이더 블라인드 박스 시뮬레이터 v9 (유출본 적용)</title>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
         /* 네온 어반 스타일 테마 */
@@ -39,7 +39,7 @@
             padding: 20px; 
         }
 
-        .container { max-width: 1000px; margin: 0 auto; }
+        .container { max-width: 1100px; margin: 0 auto; }
         
         .header { text-align: center; margin-bottom: 30px; margin-top: 10px; }
         .header h1 { color: #fff; font-weight: 900; letter-spacing: 2px; font-size: 32px; text-shadow: 0 0 15px rgba(255, 255, 255, 0.3); margin-bottom: 5px; }
@@ -108,7 +108,7 @@
             padding: 5px 10px; border-radius: 4px; letter-spacing: 2px; text-shadow: 0 0 10px rgba(255,42,109,0.5); box-shadow: 0 0 10px rgba(255,42,109,0.2) inset; z-index: 10; 
         }
 
-        .item-visual { font-size: 45px; margin: 5px 0; flex-grow: 1; display: flex; align-items: center; justify-content: center; position: relative; }
+        .item-visual { font-size: 40px; margin: 5px 0; flex-grow: 1; display: flex; align-items: center; justify-content: center; position: relative; }
         .spider .item-visual::after, .costume .item-visual::after { content: ''; position: absolute; width: 60px; height: 60px; border-radius: 50%; filter: blur(25px); opacity: 0.4; z-index: -1; }
         .spider .item-visual::after { background: var(--color-spider); }
         .costume .item-visual::after { background: var(--color-costume); }
@@ -154,7 +154,7 @@
     <div class="container">
         <div class="header">
             <h1><span class="highlight">918 SPYDER</span> BLIND BOX</h1>
-            <p>이환(NTE) 실속 광란 한정 캡슐 시뮬레이터</p>
+            <p>이환(NTE) 실속 광란 한정 캡슐 시뮬레이터 (유출본 DB)</p>
         </div>
         
         <div class="status-dashboard">
@@ -206,17 +206,23 @@
     </div>
 
     <script>
-        // 오리지널 6종류 풀 (총 15개). 번역명만 피드백 반영함.
+        // 유출 데이터 원본 바탕 풀 구성 (총 13종류, 수량 합계 15개)
         const initialPoolData = [
-            { id: 1, name: '918 스파이더 (한정)', type: 'spider', initQty: 1, weight: 1, icon: '🏎️' },
-            { id: 2, name: '최고의 파트너 (코스튬)', type: 'costume', initQty: 1, weight: 3, icon: '👗' },
-            { id: 3, name: '기만의 주사위 * 10', type: 'item', initQty: 1, weight: 5, icon: '🎲' },
-            { id: 4, name: '꿈 없는 씨앗 * 10', type: 'item', initQty: 3, weight: 10, icon: '🌱' },
-            { id: 5, name: '특급 헌터 가이드 * 10', type: 'item', initQty: 4, weight: 50, icon: '📕' },
-            { id: 6, name: '비틀코인 10만', type: 'item', initQty: 5, weight: 100, icon: '🪙' }
+            { id: 1, name: '918 스파이더', type: 'spider', initQty: 1, baseWeight: 1, icon: '🏎️' },
+            { id: 2, name: '최고의 파트너 코스튬', type: 'costume', initQty: 1, baseWeight: 3, icon: '👗' },
+            { id: 3, name: '기만의 주사위 * 10', type: 'item', initQty: 1, baseWeight: 5, icon: '🎲' },
+            { id: 4, name: '자필 편지 1통', type: 'item', initQty: 1, baseWeight: 10, icon: '✉️' },
+            { id: 5, name: '폰즈 50만', type: 'item', initQty: 1, baseWeight: 10, icon: '💳' },
+            { id: 6, name: '트랙 스케치/사진', type: 'item', initQty: 1, baseWeight: 50, icon: '🖼️' },
+            { id: 7, name: '설레는 순간', type: 'item', initQty: 1, baseWeight: 50, icon: '✨' },
+            { id: 8, name: '기만의 주사위 * 3', type: 'item', initQty: 1, baseWeight: 100, icon: '🎲' },
+            { id: 9, name: '유빙 그림', type: 'item', initQty: 1, baseWeight: 100, icon: '🧊' },
+            { id: 10, name: '폰즈 10만', type: 'item', initQty: 1, baseWeight: 100, icon: '💳' },
+            { id: 11, name: '특급 헌터 가이드 * 10', type: 'item', initQty: 2, baseWeight: 200, icon: '📕' }, // 2개
+            { id: 12, name: '꿈 없는 씨앗 * 10', type: 'item', initQty: 1, baseWeight: 100, icon: '🌱' },
+            { id: 13, name: '비틀코인 10만', type: 'item', initQty: 2, baseWeight: 200, icon: '🪙' } // 2개
         ];
 
-        // 환석 / 폰즈 소모량 테이블
         const pullCosts = [
             { hwanseok: 50, ponds: 5 },
             { hwanseok: 80, ponds: 8 },
@@ -258,6 +264,17 @@
 
         const logBoxEl = document.getElementById('logBox');
 
+        // 가중치 업데이트 로직 (핵심: 1~5뽑 스파이더 확률 0)
+        function refreshWeights() {
+            pool.forEach(item => {
+                if (item.id === 1) {
+                    item.weight = (pullCount < 5) ? 0 : item.baseWeight;
+                } else {
+                    item.weight = item.baseWeight;
+                }
+            });
+        }
+
         function updateUI() {
             countEl.innerText = pullCount;
             
@@ -284,6 +301,8 @@
                 costPondsText.innerText = `(모든 보상 획득)`;
             }
 
+            refreshWeights();
+
             const totalWeight = pool.reduce((sum, item) => sum + (item.qty * item.weight), 0);
             gridEl.innerHTML = ''; 
             
@@ -296,11 +315,17 @@
                     card.classList.add('faded');
                 }
 
+                // 1~5회차일때 스파이더 확률 0% 임을 명시적으로 보여주기 위한 텍스트 처리
+                let probText = `${prob.toFixed(2)}%`;
+                if(item.id === 1 && pullCount < 5 && item.qty > 0) {
+                    probText = `<span style="color: #ff2a6d; font-size: 13px;">(6회차부터 등장)</span>`;
+                }
+
                 card.innerHTML = `
                     <div class="item-visual">${item.icon}</div>
                     <div class="item-info">
                         <div class="item-name">${item.name}</div>
-                        <div class="item-prob">${prob.toFixed(2)}%</div>
+                        <div class="item-prob">${probText}</div>
                         <div class="item-meta">남은 수량: ${item.qty} / ${item.initQty}</div>
                     </div>
                 `;
@@ -317,13 +342,15 @@
 
             const costUsed = type === 'hwanseok' ? pullCosts[pullCount].hwanseok : pullCosts[pullCount].ponds;
 
+            refreshWeights();
+            
             let totalWeight = pool.reduce((sum, item) => sum + (item.qty * item.weight), 0);
             let rand = Math.random() * totalWeight;
             let cumulativeWeight = 0;
             let wonItem = null;
 
             for (let i = 0; i < pool.length; i++) {
-                if (pool[i].qty > 0) {
+                if (pool[i].qty > 0 && pool[i].weight > 0) { // weight 0인 템은 스킵
                     cumulativeWeight += (pool[i].qty * pool[i].weight);
                     if (rand <= cumulativeWeight) {
                         wonItem = pool[i];
