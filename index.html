@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>이환 918 스파이더 블라인드 박스 시뮬레이터 v9 (유출본 적용)</title>
+    <title>이환 918 스파이더 블라인드 박스 시뮬레이터 v11 (전 회차 가중치 정상화)</title>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
         /* 네온 어반 스타일 테마 */
@@ -154,7 +154,7 @@
     <div class="container">
         <div class="header">
             <h1><span class="highlight">918 SPYDER</span> BLIND BOX</h1>
-            <p>이환(NTE) 실속 광란 한정 캡슐 시뮬레이터 (유출본 DB)</p>
+            <p>이환(NTE) 실속 광란 한정 캡슐 시뮬레이터 (전 회차 확률 정상화)</p>
         </div>
         
         <div class="status-dashboard">
@@ -218,9 +218,9 @@
             { id: 8, name: '기만의 주사위 * 3', type: 'item', initQty: 1, baseWeight: 100, icon: '🎲' },
             { id: 9, name: '유빙 그림', type: 'item', initQty: 1, baseWeight: 100, icon: '🧊' },
             { id: 10, name: '폰즈 10만', type: 'item', initQty: 1, baseWeight: 100, icon: '💳' },
-            { id: 11, name: '특급 헌터 가이드 * 10', type: 'item', initQty: 2, baseWeight: 200, icon: '📕' }, // 2개
+            { id: 11, name: '특급 헌터 가이드 * 10', type: 'item', initQty: 2, baseWeight: 200, icon: '📕' },
             { id: 12, name: '꿈 없는 씨앗 * 10', type: 'item', initQty: 1, baseWeight: 100, icon: '🌱' },
-            { id: 13, name: '비틀코인 10만', type: 'item', initQty: 2, baseWeight: 200, icon: '🪙' } // 2개
+            { id: 13, name: '비틀코인 10만', type: 'item', initQty: 2, baseWeight: 200, icon: '🪙' }
         ];
 
         const pullCosts = [
@@ -264,14 +264,10 @@
 
         const logBoxEl = document.getElementById('logBox');
 
-        // 가중치 업데이트 로직 (핵심: 1~5뽑 스파이더 확률 0)
+        // 가중치 업데이트 로직 (1~5뽑 0% 제한 제거하고 기본 가중치로 롤백)
         function refreshWeights() {
             pool.forEach(item => {
-                if (item.id === 1) {
-                    item.weight = (pullCount < 5) ? 0 : item.baseWeight;
-                } else {
-                    item.weight = item.baseWeight;
-                }
+                item.weight = item.baseWeight;
             });
         }
 
@@ -315,17 +311,11 @@
                     card.classList.add('faded');
                 }
 
-                // 1~5회차일때 스파이더 확률 0% 임을 명시적으로 보여주기 위한 텍스트 처리
-                let probText = `${prob.toFixed(2)}%`;
-                if(item.id === 1 && pullCount < 5 && item.qty > 0) {
-                    probText = `<span style="color: #ff2a6d; font-size: 13px;">(6회차부터 등장)</span>`;
-                }
-
                 card.innerHTML = `
                     <div class="item-visual">${item.icon}</div>
                     <div class="item-info">
                         <div class="item-name">${item.name}</div>
-                        <div class="item-prob">${probText}</div>
+                        <div class="item-prob">${prob.toFixed(2)}%</div>
                         <div class="item-meta">남은 수량: ${item.qty} / ${item.initQty}</div>
                     </div>
                 `;
@@ -350,7 +340,7 @@
             let wonItem = null;
 
             for (let i = 0; i < pool.length; i++) {
-                if (pool[i].qty > 0 && pool[i].weight > 0) { // weight 0인 템은 스킵
+                if (pool[i].qty > 0 && pool[i].weight > 0) {
                     cumulativeWeight += (pool[i].qty * pool[i].weight);
                     if (rand <= cumulativeWeight) {
                         wonItem = pool[i];
