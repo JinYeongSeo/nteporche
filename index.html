@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>이환 918 스파이더 블라인드 박스 시뮬레이터 v8</title>
+    <title>이환 918 스파이더 블라인드 박스 시뮬레이터 v10 (오리지널 확률 롤백)</title>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
         /* 네온 어반 스타일 테마 */
@@ -16,14 +16,13 @@
             --text-main: #f0f0f0;
             --text-muted: #8a8a9e;
             
-            /* 등급 및 재화 컬러 */
-            --color-spider: #ff2a6d; /* 네온 핑크 */
-            --color-costume: #f9d423; /* 네온 옐로우 */
-            --color-item: #05d9e8; /* 네온 시안 */
-            --color-prob: #00ffcc; /* 확률 민트 */
+            --color-spider: #ff2a6d;
+            --color-costume: #f9d423;
+            --color-item: #05d9e8;
+            --color-prob: #00ffcc;
             
-            --color-hwanseok: #ff9100; /* 환석 오렌지 */
-            --color-ponds: #00e5ff; /* 폰즈 시안 */
+            --color-hwanseok: #ff9100;
+            --color-ponds: #00e5ff;
             
             --btn-hwanseok-bg: #ff9100;
             --btn-ponds-bg: #00acc1;
@@ -47,7 +46,6 @@
         .header .highlight { color: var(--color-spider); }
         .header p { color: var(--text-muted); font-size: 14px; letter-spacing: 1px; }
 
-        /* 글래스모피즘 상태 대시보드 */
         .status-dashboard {
             display: grid;
             grid-template-columns: 1fr 2fr 1fr;
@@ -73,7 +71,6 @@
         .currency-hwanseok { color: var(--color-hwanseok); }
         .currency-ponds { color: var(--color-ponds); }
 
-        /* 가챠 버튼 그룹 */
         .action-area { display: flex; gap: 15px; justify-content: center; margin-bottom: 35px; }
         .btn { 
             flex: 1; max-width: 350px; padding: 18px 20px; font-size: 18px; font-weight: 900; 
@@ -87,18 +84,16 @@
         .btn:hover:not(:disabled) { transform: translateY(-3px); filter: brightness(1.1); box-shadow: 0 8px 25px rgba(255,255,255,0.2); }
         .btn:active:not(:disabled) { transform: translateY(1px); }
         .btn:disabled { background: #2a2a35; color: #555; cursor: not-allowed; box-shadow: none; transform: none; filter: none; }
-
         .btn-subtext { font-size: 13px; font-weight: 700; margin-top: 5px; display: block; opacity: 0.9; }
 
-        /* 가챠 박스 그리드 */
-        .gacha-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px; margin-bottom: 35px; }
+        .gacha-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 12px; margin-bottom: 35px; }
 
         .item-card { 
             background: rgba(20, 20, 30, 0.7); backdrop-filter: blur(5px); 
             border: 1px solid var(--card-border); border-radius: 14px; 
-            padding: 15px; text-align: center; display: flex; flex-direction: column; 
+            padding: 15px 10px; text-align: center; display: flex; flex-direction: column; 
             align-items: center; justify-content: space-between; position: relative; 
-            transition: all 0.3s ease; height: 230px; 
+            transition: all 0.3s ease; height: 215px; 
         }
         
         .item-card:not(.faded):hover { transform: translateY(-5px); background: rgba(30, 30, 45, 0.9); border-color: rgba(255,255,255,0.3); }
@@ -106,26 +101,26 @@
         .item-card.spider { border: 1px solid var(--color-spider); box-shadow: inset 0 0 20px rgba(255, 42, 109, 0.1), 0 0 10px rgba(255, 42, 109, 0.2); }
         .item-card.costume { border: 1px solid var(--color-costume); box-shadow: inset 0 0 20px rgba(249, 212, 35, 0.1), 0 0 10px rgba(249, 212, 35, 0.2); }
 
-        .item-card.faded { opacity: 0.3; filter: grayscale(100%); border-color: #222 !important; pointer-events: none; }
+        .item-card.faded { opacity: 0.2; filter: grayscale(100%); border-color: #222 !important; pointer-events: none; }
         .item-card.faded::after { 
             content: 'SOLD OUT'; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-10deg); 
-            font-size: 22px; font-weight: 900; color: #ff2a6d; border: 3px solid #ff2a6d; 
-            padding: 5px 15px; border-radius: 4px; letter-spacing: 2px; text-shadow: 0 0 10px rgba(255,42,109,0.5); box-shadow: 0 0 10px rgba(255,42,109,0.2) inset; z-index: 10; 
+            font-size: 18px; font-weight: 900; color: #ff2a6d; border: 3px solid #ff2a6d; 
+            padding: 5px 10px; border-radius: 4px; letter-spacing: 2px; text-shadow: 0 0 10px rgba(255,42,109,0.5); box-shadow: 0 0 10px rgba(255,42,109,0.2) inset; z-index: 10; 
         }
 
-        .item-visual { font-size: 55px; margin: 10px 0; flex-grow: 1; display: flex; align-items: center; justify-content: center; position: relative; }
-        .spider .item-visual::after { content: ''; position: absolute; width: 70px; height: 70px; border-radius: 50%; background: var(--color-spider); filter: blur(25px); opacity: 0.4; z-index: -1; }
-        .costume .item-visual::after { content: ''; position: absolute; width: 70px; height: 70px; border-radius: 50%; background: var(--color-costume); filter: blur(25px); opacity: 0.4; z-index: -1; }
+        .item-visual { font-size: 45px; margin: 5px 0; flex-grow: 1; display: flex; align-items: center; justify-content: center; position: relative; }
+        .spider .item-visual::after, .costume .item-visual::after { content: ''; position: absolute; width: 60px; height: 60px; border-radius: 50%; filter: blur(25px); opacity: 0.4; z-index: -1; }
+        .spider .item-visual::after { background: var(--color-spider); }
+        .costume .item-visual::after { background: var(--color-costume); }
 
-        .item-info { width: 100%; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 10px; }
-        .item-name { font-size: 13px; font-weight: 700; margin-bottom: 5px; word-break: keep-all; height: 36px; display: flex; align-items: center; justify-content: center; line-height: 1.3; }
+        .item-info { width: 100%; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 8px; }
+        .item-name { font-size: 12px; font-weight: 700; margin-bottom: 3px; word-break: keep-all; height: 32px; display: flex; align-items: center; justify-content: center; line-height: 1.2; }
         .spider .item-name { color: var(--color-spider); text-shadow: 0 0 8px rgba(255,42,109,0.4); }
         .costume .item-name { color: var(--color-costume); text-shadow: 0 0 8px rgba(249,212,35,0.4); }
         
-        .item-prob { font-size: 18px; font-weight: 900; color: var(--color-prob); margin: 5px 0; text-shadow: 0 0 8px rgba(0, 255, 204, 0.4); }
-        .item-meta { font-size: 11px; color: var(--text-muted); background: rgba(0,0,0,0.3); padding: 3px 8px; border-radius: 20px; display: inline-block; }
+        .item-prob { font-size: 16px; font-weight: 900; color: var(--color-prob); margin: 3px 0; text-shadow: 0 0 8px rgba(0, 255, 204, 0.4); }
+        .item-meta { font-size: 10px; color: var(--text-muted); background: rgba(0,0,0,0.3); padding: 3px 8px; border-radius: 20px; display: inline-block; }
 
-        /* 로그 세팅 */
         .log-container { background: #050508; padding: 20px; border-radius: 14px; border: 1px solid #1f1f2e; box-shadow: inset 0 0 20px rgba(0,0,0,0.5); }
         .log-header { font-size: 13px; color: var(--color-item); margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px dashed #1f1f2e; display: flex; justify-content: space-between; font-weight: 700; letter-spacing: 1px; }
         .btn-reset { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: var(--text-muted); cursor: pointer; font-size: 11px; padding: 4px 10px; border-radius: 4px; transition: 0.2s; }
@@ -141,16 +136,15 @@
         ::-webkit-scrollbar-thumb { background: #2a2a35; border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: var(--color-item); }
 
-        /* 모바일 반응형 쿼리 */
         @media (max-width: 768px) {
             .status-dashboard { grid-template-columns: 1fr; gap: 10px; padding: 15px; }
             .action-area { flex-direction: column; gap: 12px; }
             .btn { max-width: 100%; font-size: 16px; padding: 16px; }
             .gacha-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
-            .item-card { height: 210px; padding: 10px; }
-            .item-visual { font-size: 45px; }
+            .item-card { height: 195px; padding: 10px; }
+            .item-visual { font-size: 36px; }
             .item-name { font-size: 11px; height: 32px; }
-            .item-prob { font-size: 16px; }
+            .item-prob { font-size: 15px; }
             .header h1 { font-size: 24px; }
             .val-total-split { font-size: 16px; flex-direction: column; gap: 5px; }
         }
@@ -212,16 +206,17 @@
     </div>
 
     <script>
+        // 오리지널 6종류 풀 (총 15개). 번역명만 피드백 반영함.
         const initialPoolData = [
             { id: 1, name: '918 스파이더 (한정)', type: 'spider', initQty: 1, weight: 1, icon: '🏎️' },
             { id: 2, name: '최고의 파트너 (코스튬)', type: 'costume', initQty: 1, weight: 3, icon: '👗' },
-            { id: 3, name: '날조의 주사위 * 10', type: 'item', initQty: 1, weight: 5, icon: '🎲' },
-            { id: 4, name: '무몽의 과핵 * 10', type: 'item', initQty: 3, weight: 10, icon: '🔮' },
-            { id: 5, name: '특급 헌터 공략 * 10', type: 'item', initQty: 4, weight: 50, icon: '📕' },
-            { id: 6, name: '비틀 코인 * 100,000', type: 'item', initQty: 5, weight: 100, icon: '💰' }
+            { id: 3, name: '기만의 주사위 * 10', type: 'item', initQty: 1, weight: 5, icon: '🎲' },
+            { id: 4, name: '꿈 없는 씨앗 * 10', type: 'item', initQty: 3, weight: 10, icon: '🌱' },
+            { id: 5, name: '특급 헌터 가이드 * 10', type: 'item', initQty: 4, weight: 50, icon: '📕' },
+            { id: 6, name: '비틀코인 10만', type: 'item', initQty: 5, weight: 100, icon: '🪙' }
         ];
 
-        // 업데이트된 재화 테이블 반영 (폰즈는 숫자 그대로 쓰고 뒤에 '만'만 붙임)
+        // 환석 / 폰즈 소모량 테이블
         const pullCosts = [
             { hwanseok: 50, ponds: 5 },
             { hwanseok: 80, ponds: 8 },
